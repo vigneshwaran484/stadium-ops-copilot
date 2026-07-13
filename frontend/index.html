@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StadiumOps Copilot — AI Volunteer Assistant</title>
+  <meta name="description" content="AI-powered volunteer assistant for FIFA World Cup 2026 stadium operations. Get real-time SOP guidance, escalation decisions, and multilingual support."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/static/style.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+
+  <div class="app-container" id="appContainer">
+
+    <!-- ── Header Bar ── -->
+    <header class="app-header" role="banner">
+      <div class="header-left">
+        <div class="logo">
+          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect width="40" height="40" rx="12" fill="var(--accent)"/>
+            <path d="M12 12l8 4-8 4V12z" fill="#fff" opacity="0.9"/>
+            <circle cx="28" cy="16" r="4" fill="#fff" opacity="0.7"/>
+            <path d="M10 28h20M10 24h14" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          StadiumOps <span class="badge">COPILOT</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <!-- Language Selector -->
+        <div class="language-selector-wrapper">
+          <label for="languageSelect" class="sr-only">Response Language</label>
+          <select id="languageSelect" class="language-select" aria-label="Select response language">
+            <option value="en" selected>🇺🇸 English</option>
+            <option value="es">🇪🇸 Español</option>
+            <option value="fr">🇫🇷 Français</option>
+            <option value="ar">🇸🇦 العربية</option>
+            <option value="pt">🇧🇷 Português</option>
+            <option value="de">🇩🇪 Deutsch</option>
+          </select>
+        </div>
+        <!-- Volunteer Context -->
+        <button id="contextBtn" class="context-btn" aria-label="Set your zone and role" title="Set your zone and role">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/></svg>
+          <span id="contextLabel">Set Zone & Role</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ── Main Chat Area ── -->
+    <main class="chat-area" role="main">
+      <div class="chat-messages" id="chatMessages" role="log" aria-label="Chat message history" aria-live="polite">
+
+        <!-- Welcome Screen -->
+        <div class="welcome-screen" id="welcomeScreen">
+          <div class="welcome-logo">
+            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect width="40" height="40" rx="12" fill="var(--accent)"/>
+              <path d="M12 12l8 4-8 4V12z" fill="#fff" opacity="0.9"/>
+              <circle cx="28" cy="16" r="4" fill="#fff" opacity="0.7"/>
+              <path d="M10 28h20M10 24h14" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h1>How can I help you today?</h1>
+          <p>Ask me about stadium SOPs — medical emergencies, lost children, crowd control, security, accessibility, weather protocols, and more.</p>
+
+          <div class="suggestions" id="suggestions" role="group" aria-label="Suggested questions">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── Input Bar ── -->
+      <div class="chat-input-container">
+        <div class="chat-input-box">
+          <textarea
+            id="questionInput"
+            placeholder="Describe the situation or ask a question..."
+            rows="1"
+            aria-label="Type your question"
+            tabindex="0"
+          ></textarea>
+          <button id="escalateBtn" class="escalate-button" aria-label="Escalate to human supervisor" title="Escalate to human supervisor" tabindex="0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Escalate
+          </button>
+          <button id="sendBtn" class="send-button" disabled aria-label="Send message" tabindex="0">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+        <div class="disclaimer" role="contentinfo">StadiumOps Copilot provides SOP-based guidance. Always follow your supervisor's instructions for final decisions.</div>
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container" role="alert" aria-live="assertive"></div>
+
+  <!-- Context Modal -->
+  <div id="contextModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Set volunteer context" style="display:none;">
+    <div class="modal-card">
+      <h2>Your Assignment</h2>
+      <p>Tell the Copilot your zone and role for tailored guidance.</p>
+      <div class="modal-field">
+        <label for="zoneInput">Stadium Zone</label>
+        <input type="text" id="zoneInput" placeholder="e.g., North Stand Gate 7" maxlength="200" aria-label="Stadium zone"/>
+      </div>
+      <div class="modal-field">
+        <label for="roleInput">Volunteer Role</label>
+        <input type="text" id="roleInput" placeholder="e.g., Guest Services, Security, Medical" maxlength="200" aria-label="Volunteer role"/>
+      </div>
+      <div class="modal-actions">
+        <button id="modalSaveBtn" class="modal-save" tabindex="0">Save</button>
+        <button id="modalCancelBtn" class="modal-cancel" tabindex="0">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
