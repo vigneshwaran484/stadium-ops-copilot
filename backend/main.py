@@ -53,7 +53,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -80,10 +80,12 @@ if os.path.isdir(FRONTEND_DIR):
     app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
 
     @app.get("/", include_in_schema=False)
+    @app.head("/", include_in_schema=False)
     async def serve_frontend():
         return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
 
     @app.get("/{full_path:path}", include_in_schema=False)
+    @app.head("/{full_path:path}", include_in_schema=False)
     async def catch_all(full_path: str):
         file_path = os.path.join(FRONTEND_DIR, full_path)
         if os.path.isfile(file_path):
